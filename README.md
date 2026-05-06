@@ -32,7 +32,7 @@ $$
 
 ## 数据生成方法
 
-数据不是从外部下载，而是由 Lorenz 方程数值模拟生成：
+数据是由 Lorenz 方程数值模拟生成：
 
 1. 使用 `scipy.integrate.solve_ivp` 求解 Lorenz 微分方程；
 2. 初始状态设置为 `(1, 1, 1)`；
@@ -87,51 +87,7 @@ $$
 
 结果表格保存在 `results/` 文件夹。
 
-## 如何运行 notebook
 
-建议先创建虚拟环境，然后安装依赖：
-
-```bash
-pip install -r requirements.txt
-```
-
-启动 Jupyter Notebook：
-
-```bash
-jupyter notebook
-```
-
-打开并从头运行：
-
-```text
-lorenz_chaos_prediction.ipynb
-```
-
-运行完成后会自动生成或更新：
-
-- `figures/` 中的所有图表；
-- `results/` 中的数据表、指标表和摘要文件。
-
-## 如何编译报告
-
-本项目报告源文件为：
-
-```text
-report.tex
-```
-
-需要使用 XeLaTeX 编译中文 LaTeX：
-
-```bash
-xelatex report.tex
-xelatex report.tex
-```
-
-编译后生成：
-
-```text
-report.pdf
-```
 
 ## 项目文件结构
 
