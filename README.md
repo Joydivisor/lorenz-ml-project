@@ -215,25 +215,25 @@ hybrid_prediction = s_physics(t+1) + ML_residual
 
 | 模型 | RMSE | MAE | R² |
 |---|---:|---:|---:|
-| Persistence Model | 2.1653 | 1.7657 | 0.9208 |
-| Linear Regression | 0.5679 | 0.4556 | 0.9946 |
-| Random Forest | 0.0887 | 0.0504 | 0.9999 |
-| MLP | 0.0779 | 0.0574 | 0.9999 |
+| Persistence Model | 2.2104 | 1.8254 | 0.9208 |
+| Linear Regression | 0.5457 | 0.4437 | 0.9952 |
+| Random Forest | 0.0805 | 0.0507 | 0.9999 |
+| MLP | 0.0757 | 0.0599 | 0.9999 |
 
 增强实验表明，完整三维状态预测在短 horizon 下仍较准确，但随着 horizon 增大误差明显上升。例如：
 
 | Horizon | 模型 | State RMSE | Mean R² |
 |---:|---|---:|---:|
-| 10 | Random Forest | 0.2987 | 0.9996 |
-| 10 | MLP | 0.4572 | 0.9991 |
-| 100 | Random Forest | 4.3280 | 0.9164 |
-| 100 | MLP | 2.2369 | 0.9781 |
-| 500 | Random Forest | 12.7868 | 0.2607 |
-| 500 | MLP | 13.6858 | 0.1591 |
+| 10 | Random Forest | 0.3425 | 0.9995 |
+| 10 | MLP | 0.4130 | 0.9993 |
+| 100 | Random Forest | 3.1292 | 0.9569 |
+| 100 | MLP | 2.1529 | 0.9800 |
+| 500 | Random Forest | 10.9789 | 0.4714 |
+| 500 | MLP | 14.0980 | 0.1245 |
 
-Recursive rollout 也显示，一步预测模型在递归使用时会出现明显误差累积。500 步 rollout 结束时，Linear Regression、Random Forest、MLP 的累计 state RMSE 分别约为 `20.2040`、`14.3255`、`18.0711`。
+Recursive rollout 也显示，一步预测模型在递归使用时会出现明显误差累积。500 步 rollout 结束时，Linear Regression、Random Forest、MLP 的累计 state RMSE 分别约为 `20.2244`、`14.5356`、`19.8142`。
 
-模型增强实验进一步表明，Residual MLP 和输出标准化能显著改善中短期三维状态预测。例如 horizon=10 时，`MLP-residual-relu-64x64x64` 的 state RMSE 为 `0.0772`；horizon=100 时，该模型 state RMSE 为 `1.4133`，优于原始 MLP 的 `2.2369`。在 enhanced rollout 中，`MLP-residual-tanh-64x64` 的 500 步累计 state RMSE 约为 `10.7975`，优于原始 MLP rollout 的 `18.0711`。ESN 作为 reservoir computing 模型在本实验中表现中等，rollout 累计 state RMSE 约为 `14.7144`，可作为动力系统时间序列模型的补充对照。
+模型增强实验进一步表明，Residual MLP 和输出标准化能显著改善中短期三维状态预测。例如 horizon=10 时，`MLP-residual-relu-64x64x64` 的 state RMSE 为 `0.0833`；horizon=100 时，该模型 state RMSE 为 `0.8306`，优于原始 MLP 的 `2.1529`。在 enhanced rollout 中，`MLP-residual-tanh-64x64` 的 500 步累计 state RMSE 约为 `11.1571`，优于原始 MLP rollout 的 `19.8142`。ESN 作为 reservoir computing 模型在本实验中表现中等，rollout 累计 state RMSE 约为 `14.3415`，可作为动力系统时间序列模型的补充对照。
 
 SINDy 实验从轨迹数据中恢复出接近真实 Lorenz 方程的稀疏结构：
 
@@ -245,7 +245,9 @@ dz/dt ≈ 0.9992xy - 2.6646z
 
 Hybrid correction 实验进一步表明，机器学习可以作为不完美物理模型的残差修正器。真实系统使用 `rho=28`，不完美物理模型使用 `rho=26` 时，一步 state RMSE 从 `0.0786` 降至 `0.0003`（Hybrid RF）和 `0.0006`（Hybrid MLP）。在 500 步 rollout 中，imperfect physics 的有效预测时间约为 `0.35` 个 Lyapunov time，pure ML residual MLP 约为 `1.86` 个 Lyapunov time，而 Hybrid RF 和 Hybrid MLP 在 500 步窗口内均未超过失效阈值，对应至少 `2.25` 个 Lyapunov time。
 
-因此，本项目的主要结论是：机器学习模型可以较好学习 Lorenz 系统的短期局部状态转移映射；SINDy 可以从数据中识别动力学方程结构；Hybrid physical-ML correction 可以显著改善参数有偏物理模型的短中期推演。但预测步长增大、递归多步预测和初始条件变化仍会使预测难度上升，不能将短期高精度夸大为“机器学习已经解决混沌系统长期预测”。
+因此，本项目的主要结论是：机器学习模型可以较好学习 Lorenz 系统的短期局部状态转移映射；SINDy 可以从数据中识别动力学方程结构；Hybrid physical-ML correction 在当前 `rho=26` 参数偏差设定下可以显著改善不完美物理模型的短中期推演。但预测步长增大、递归多步预测和初始条件变化仍会使预测难度上升，不能将短期高精度夸大为“机器学习已经解决混沌系统长期预测”。
+
+报告中的手写表格可用 `generate_report_tables.py` 从 `results/*.csv` 重新生成 LaTeX 片段，减少 CSV 与论文数值不一致。
 
 ## 如何运行
 
